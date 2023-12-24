@@ -73,11 +73,13 @@ const keys = {
 let lastKey = '';
 
 const map = [
-    ['-', '-', '-', '-', '-', '-'],
-    ['-', ' ', ' ', ' ', ' ', '-'],
-    ['-', ' ', '-', '-', ' ', '-'],
-    ['-', ' ', ' ', ' ', ' ', '-'],
-    ['-', '-', '-', '-', '-', '-']
+    ['-', '-', '-', '-', '-', '-', '-'],
+    ['-', ' ', ' ', ' ', ' ', ' ', '-'],
+    ['-', ' ', '-', ' ', '-', ' ', '-'],
+    ['-', ' ', ' ', ' ', ' ', ' ', '-'],
+    ['-', ' ', '-', ' ', '-', ' ', '-'],
+    ['-', ' ', ' ', ' ', ' ', ' ', '-'],
+    ['-', '-', '-', '-', '-', '-', '-']
 ];
 
 map.forEach((row, i) => {
@@ -96,23 +98,72 @@ map.forEach((row, i) => {
     })
 });
 
-
+function ballsAndRectangles({ circle, rectangle }){
+    return (
+        circle.position.y - circle.radius + circle.speed.y <= rectangle.position.y + rectangle.height
+        && 
+        circle.position.x + circle.radius + circle.speed.x >= rectangle.position.x
+        && 
+        circle.position.y + circle.radius + circle.speed.y >= rectangle.position.y
+        && 
+        circle.position.x - circle.radius + circle.speed.x <= rectangle.position.x + rectangle.width
+        )
+};
 
 function animate(){
     requestAnimationFrame(animate)
     context.clearRect(0, 0, canvas.width, canvas.height);
+
+    if(keys.w.pressed && lastKey === 'w'){
+
+        for (let i = 0; i < boundaries.length; i++){
+            const boundary = boundaries[i];
+        if(
+            ballsAndRectangles({
+            circle: { ...player, velocity: {
+                x: 0,
+                y:-5
+            }},
+            rectangle: boundary
+        })) {
+            player.speed.y = 0;
+            break;
+        } else{
+            player.speed.y = -5;
+        }
+    }
+    } else if(keys.a.pressed && lastKey === 'a'){
+        player.speed.x = -5;
+    }
+    else if(keys.d.pressed && lastKey === 'd'){
+        player.speed.x = 5;
+    }
+    else if(keys.s.pressed && lastKey === 's'){
+            for (let i = 0; i < boundaries.length; i++){
+                const boundary = boundaries[i];
+            if(
+                ballsAndRectangles({
+                circle: { ...player, velocity: {
+                    x: 0,
+                    y: 5
+                }},
+                rectangle: boundary
+            })) {
+                player.speed.y = 0;
+                break;
+            } else{
+                player.speed.y = 5;
+            }
+        }
+    }
+
     boundaries.forEach((boundary) =>{
         boundary.draw();
         if(
-            player.position.y - player.radius + player.speed.y <= boundary.position.y + boundary.height
-            && 
-            player.position.x + player.radius + player.speed.x >= boundary.position.x
-            && 
-            player.position.y + player.radius + player.speed.y >= boundary.position.y
-            && 
-            player.position.x - player.radius + player.speed.x <= boundary.position.x + boundary.width
-        ){
-            console.log('COLIDED'); 
+            ballsAndRectangles({ circle: player, rectangle: boundary })
+        )
+
+        {
             player.speed.x = 0;
             player.speed.y = 0;
         }
@@ -121,18 +172,7 @@ function animate(){
     // player.speed.y = 0;
     // player.speed.x = 0;
 
-    if(keys.w.pressed && lastKey === 'w'){
-        player.speed.y = -5;
-    }
-    else if(keys.a.pressed && lastKey === 'a'){
-        player.speed.x = -5;
-    }
-    else if(keys.d.pressed && lastKey === 'd'){
-        player.speed.x = 5;
-    }
-    else if(keys.s.pressed && lastKey === 's'){
-        player.speed.y = 5;
-    }
+
 }
 
 animate();
