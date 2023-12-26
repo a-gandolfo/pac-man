@@ -1,23 +1,25 @@
-const canvas = document.querySelector('canvas');
-const context = canvas.getContext('2d');
+const canvas = document.querySelector('canvas')
+const context = canvas.getContext('2d')
 
-canvas.width = innerWidth;
-canvas.height = innerHeight;
+canvas.width = innerWidth
+canvas.height = innerHeight
+
+
 
 class Boundary{
-    static width = 40;
-    static height = 40;
-    constructor({ position }){
+    constructor({ position, grau, width, height}){
         this.position = position
-        this.width = 40;
-        this.height = 40;
+        this.grau = grau
+        this.width = width
+        this.height = height
     }
     draw(){
         context.fillStyle = 'blue'
         context.fillRect(this.position.x, this.position.y, this.width, this.height);
-    };
-};
-
+        context.fillStyle = 'black'
+        context.fillRect(this.position.x, this.position.y, this.width, this.height);
+    }
+}
 class Player{
     constructor({
         position,
@@ -42,7 +44,7 @@ class Player{
     }
 }
 
-const boundaries = [];
+const boundaries = []
 
 const player = new Player({
     position: {
@@ -70,33 +72,48 @@ const keys = {
     }
 }
 
-let lastKey = '';
+let lastKey = ''
 
 const map = [
     ['-', '-', '-', '-', '-', '-', '-'],
-    ['-', ' ', ' ', ' ', ' ', ' ', '-'],
-    ['-', ' ', '-', ' ', '-', ' ', '-'],
-    ['-', ' ', ' ', ' ', ' ', ' ', '-'],
-    ['-', ' ', '-', ' ', '-', ' ', '-'],
-    ['-', ' ', ' ', ' ', ' ', ' ', '-'],
+    ['|', ' ', ' ', ' ', ' ', ' ', '|'],
+    ['|', ' ', '-', ' ', '-', ' ', '|'],
+    ['|', ' ', ' ', ' ', ' ', ' ', '|'],
+    ['|', ' ', '-', ' ', '-', ' ', '|'],
+    ['|', ' ', ' ', ' ', ' ', ' ', '|'],
     ['-', '-', '-', '-', '-', '-', '-']
-];
+]
 
 map.forEach((row, i) => {
     row.forEach(( symbol, j ) => {
         switch(symbol){
             case '-':
                 boundaries.push(
-                    new Boundary({position: {
-                        x: Boundary.width * j,
-                        y: Boundary.height * i
+                    new Boundary({
+                        position: {
+                            x: Boundary.width * j,
+                            y: Boundary.height * i
+                    },
+                    height : 40,
+                    width : 40,
+                })
+            )
+                break
+                case '|':
+                boundaries.push(
+                    new Boundary({
+                        position: {
+                            x: Boundary.width * j,
+                            y: Boundary.height * i
+                    },
+                    grau: {
+
                     }
                 })
             )
-                break;
         }
     })
-});
+})
 
 function ballsAndRectangles({ circle, rectangle }){
     return (
@@ -108,16 +125,16 @@ function ballsAndRectangles({ circle, rectangle }){
         && 
         circle.position.x - circle.radius + circle.speed.x <= rectangle.position.x + rectangle.width
         )
-};
+}
 
 function animate(){
     requestAnimationFrame(animate)
-    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.clearRect(0, 0, canvas.width, canvas.height)
 
     if(keys.w.pressed && lastKey === 'w'){
 
         for (let i = 0; i < boundaries.length; i++){
-            const boundary = boundaries[i];
+            const boundary = boundaries[i]
         if(
             ballsAndRectangles({
             circle: { ...player, velocity: {
@@ -133,14 +150,44 @@ function animate(){
         }
     }
     } else if(keys.a.pressed && lastKey === 'a'){
-        player.speed.x = -5;
+        for (let i = 0; i < boundaries.length; i++){
+            const boundary = boundaries[i];
+        if(
+            ballsAndRectangles({
+            circle: { ...player, velocity: {
+                x: -5,
+                y: 0
+            }},
+            rectangle: boundary
+        })) {
+            player.speed.x = 0
+            break
+        } else{
+            player.speed.x = -5
+        }
+    }
     }
     else if(keys.d.pressed && lastKey === 'd'){
-        player.speed.x = 5;
+        for (let i = 0; i < boundaries.length; i++){
+            const boundary = boundaries[i]
+        if(
+            ballsAndRectangles({
+            circle: { ...player, velocity: {
+                x: 5,
+                y: 0
+            }},
+            rectangle: boundary
+        })) {
+            player.speed.x = 0;
+            break;
+        } else{
+            player.speed.x = 5;
+        }
+    }
     }
     else if(keys.s.pressed && lastKey === 's'){
             for (let i = 0; i < boundaries.length; i++){
-                const boundary = boundaries[i];
+                const boundary = boundaries[i]
             if(
                 ballsAndRectangles({
                 circle: { ...player, velocity: {
@@ -149,26 +196,26 @@ function animate(){
                 }},
                 rectangle: boundary
             })) {
-                player.speed.y = 0;
+                player.speed.y = 0
                 break;
             } else{
-                player.speed.y = 5;
+                player.speed.y = 5
             }
         }
     }
 
     boundaries.forEach((boundary) =>{
-        boundary.draw();
+        boundary.draw()
         if(
             ballsAndRectangles({ circle: player, rectangle: boundary })
         )
 
         {
-            player.speed.x = 0;
-            player.speed.y = 0;
+            player.speed.x = 0
+            player.speed.y = 0
         }
     });
-    player.update();
+    player.update()
     // player.speed.y = 0;
     // player.speed.x = 0;
 
