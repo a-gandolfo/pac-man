@@ -1,25 +1,25 @@
-const canvas = document.querySelector('canvas')
-const context = canvas.getContext('2d')
+const canvas = document.querySelector('canvas');
+const context = canvas.getContext('2d');
 
-canvas.width = innerWidth
-canvas.height = innerHeight
-
-
+canvas.width = innerWidth;
+canvas.height = innerHeight;
 
 class Boundary{
-    constructor({ position, grau, width, height}){
+    static width = 40;
+    static height = 40;
+    constructor({ position }){
         this.position = position
-        this.grau = grau
-        this.width = width
-        this.height = height
+        this.width = 40;
+        this.height = 40;
     }
     draw(){
-        context.fillStyle = 'blue'
-        context.fillRect(this.position.x, this.position.y, this.width, this.height);
         context.fillStyle = 'black'
         context.fillRect(this.position.x, this.position.y, this.width, this.height);
-    }
-}
+        context.strokeStyle = 'blue'
+        context.strokeRect(this.position.x, this.position.y, this.width, this.height);
+    };
+};
+
 class Player{
     constructor({
         position,
@@ -76,11 +76,11 @@ let lastKey = ''
 
 const map = [
     ['-', '-', '-', '-', '-', '-', '-'],
-    ['|', ' ', ' ', ' ', ' ', ' ', '|'],
-    ['|', ' ', '-', ' ', '-', ' ', '|'],
-    ['|', ' ', ' ', ' ', ' ', ' ', '|'],
-    ['|', ' ', '-', ' ', '-', ' ', '|'],
-    ['|', ' ', ' ', ' ', ' ', ' ', '|'],
+    ['-', ' ', ' ', ' ', ' ', ' ', '-'],
+    ['-', ' ', '-', ' ', '-', ' ', '-'],
+    ['-', ' ', ' ', ' ', ' ', ' ', '-'],
+    ['-', ' ', '-', ' ', '-', ' ', '-'],
+    ['-', ' ', ' ', ' ', ' ', ' ', '-'],
     ['-', '-', '-', '-', '-', '-', '-']
 ]
 
@@ -89,31 +89,16 @@ map.forEach((row, i) => {
         switch(symbol){
             case '-':
                 boundaries.push(
-                    new Boundary({
-                        position: {
-                            x: Boundary.width * j,
-                            y: Boundary.height * i
-                    },
-                    height : 40,
-                    width : 40,
-                })
-            )
-                break
-                case '|':
-                boundaries.push(
-                    new Boundary({
-                        position: {
-                            x: Boundary.width * j,
-                            y: Boundary.height * i
-                    },
-                    grau: {
-
+                    new Boundary({position: {
+                        x: Boundary.width * j,
+                        y: Boundary.height * i
                     }
                 })
             )
+                break;
         }
     })
-})
+});
 
 function ballsAndRectangles({ circle, rectangle }){
     return (
