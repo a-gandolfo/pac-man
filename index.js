@@ -1,5 +1,6 @@
 const canvas = document.querySelector('canvas');
 const context = canvas.getContext('2d');
+const score = document.querySelector('#score')
 
 canvas.width = innerWidth;
 canvas.height = innerHeight;
@@ -56,6 +57,8 @@ class Player{
     }
 }
 
+const pellets = [];
+
 const boundaries = []
 
 const player = new Player({
@@ -68,6 +71,23 @@ const player = new Player({
         y: 0
     }
 })
+
+
+class Pellet{
+    constructor({
+        position,
+    }){
+        this.position = position,
+        this.radius = 3
+    }
+    draw(){
+        context.fillStyle = 'white'
+        context.beginPath();
+        context.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI)
+        context.fill();
+        context.closePath();
+    }
+}
 
 const keys = {
     w:{
@@ -98,7 +118,7 @@ const map = [
     ['|', '.', '[', ']', '.', '.', '.', '[', ']', '.', '|'],
     ['|', '.', '.', '.', '.', '^', '.', '.', '.', '.', '|'],
     ['|', '.', 'b', '.', '[', '5', ']', '.', 'b', '.', '|'],
-    ['|', '.', '.', '.', '.', '.', '.', '.', '.', 'p', '|'],
+    ['|', '.', '.', '.', '.', '.', '.', '.', '.', '.', '|'],
     ['4', '-', '-', '-', '-', '-', '-', '-', '-', '-', '3']
   ]
 
@@ -284,6 +304,16 @@ map.forEach((row, i) => {
                               })
                             )
                         break
+                        case '.':
+                            pellets.push(
+                              new Pellet({
+                                position: {
+                                  x: j * Boundary.width + Boundary.width / 2,
+                                  y: i * Boundary.height + Boundary.height / 2
+                                },
+                              })
+                            )
+                        break
                         
         }
     })
@@ -378,6 +408,10 @@ function animate(){
         }
     }
 
+    pellets.forEach(pellet =>{
+        pellet.draw()
+    })
+
     boundaries.forEach((boundary) =>{
         boundary.draw()
         if(
@@ -395,6 +429,24 @@ function animate(){
 
 
 }
+
+function collision(pellet){
+    for(let i = 0; i < pellets.length; i++){
+        pellet = pellets[i];
+        const index = pellets.indexOf(pellet);
+    
+        if(Math.hypot(pellet.position.x - player.position.x,
+            pellet.position.y - player.position.y) < pellet.radius + player.radius){
+            if(index > -1){
+                pellets.splice(index, 1);
+                score.value = 1
+                console.log('comeu')
+            }
+        }
+    }
+}
+
+setInterval(collision, 100);
 
 animate();
 
